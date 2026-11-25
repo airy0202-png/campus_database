@@ -15,7 +15,7 @@
   <body>
     <header class="site-header">
       <a class="brand" href="#top" aria-label="CampusConnect home"><span class="brand-mark" aria-hidden="true">C</span><span>Campus<span class="brand-accent">Connect</span></span></a>
-      <nav class="main-nav" aria-label="Main navigation"><a class="nav-link active" href="#events">Events</a><a class="nav-link" href="#my-registrations">My registrations</a></nav>
+      <nav class="main-nav" aria-label="Main navigation"><a class="nav-link active" href="#events">Events</a><a class="nav-link" href="#my-registrations">My registrations</a><a class="nav-link" href="#organizer">Organizer</a></nav>
       <button class="identity-trigger" id="identity-trigger" type="button"><span class="avatar" aria-hidden="true">U</span><span id="identity-label">Add your campus ID</span><span class="chevron" aria-hidden="true">⌄</span></button>
     </header>
 
@@ -51,6 +51,11 @@
       <section class="content-section registrations-section" id="my-registrations">
         <div class="section-heading registration-heading"><div><div class="section-kicker"><span aria-hidden="true">▣</span> YOUR PLANS</div><h2>My registrations</h2><p class="section-subtitle">Events you’ve registered for with this campus ID.</p></div><button class="text-button" id="refresh-registrations" type="button"><span aria-hidden="true">↻</span> Refresh</button></div>
         <div class="registration-list" id="registration-list" aria-live="polite"><div class="registration-placeholder"><span class="placeholder-icon" aria-hidden="true">♧</span><div><strong>Keep your plans in one place</strong><p>Add your campus ID to see your registrations here.</p></div><button class="text-button" id="registration-identity" type="button">Add campus ID →</button></div></div>
+      </section>
+      <section class="content-section organizer-section" id="organizer">
+        <div class="section-heading"><div><div class="section-kicker"><span aria-hidden="true">▤</span> ORGANIZER TOOLS</div><h2>Attendee registrations</h2><p class="section-subtitle">Review the people registered for events you organize.</p></div></div>
+        <div class="organizer-security-note" role="note"><span class="security-icon" aria-hidden="true">!</span><span><strong>Demo access:</strong> The current API identifies the organizer by a typed UUID, not a verified sign-in. Anyone who knows that UUID could impersonate the organizer. Don’t show real attendee emails publicly until authentication is added.</span></div>
+        <div class="organizer-list" id="organizer-list" aria-live="polite"><div class="registration-empty">Set your campus ID to find events organized by you.</div></div>
       </section>
     </main>
 

@@ -8,7 +8,7 @@
   const glyphs = ["✳", "◈", "↗", "✧", "◎", "⌘"];
   const state = { events: [], registrations: [], page: 1, hasMore: false, query: "", filter: "all", userId: localStorage.getItem(STORAGE_KEY) || "", selectedEvent: null, loadingEvents: false, pendingEventId: null };
   const $ = (selector) => document.querySelector(selector);
-  const ui = { grid: $("#event-grid"), summary: $("#result-summary"), empty: $("#empty-state"), emptyTitle: $("#empty-title"), emptyCopy: $("#empty-copy"), notice: $("#notice"), pagination: $("#pagination-row"), pageCaption: $("#page-caption"), loadMore: $("#load-more"), registrationList: $("#registration-list"), identityDialog: $("#identity-dialog"), eventDialog: $("#event-dialog"), identityInput: $("#user-id-input"), identityError: $("#identity-error"), forgetId: $("#forget-id") };
+  const ui = { grid: $("#event-grid"), summary: $("#result-summary"), empty: $("#empty-state"), emptyTitle: $("#empty-title"), emptyCopy: $("#empty-copy"), notice: $("#notice"), pagination: $("#pagination-row"), pageCaption: $("#page-caption"), loadMore: $("#load-more"), registrationList: $("#registration-list"), organizerList: $("#organizer-list"), identityDialog: $("#identity-dialog"), eventDialog: $("#event-dialog"), identityInput: $("#user-id-input"), identityError: $("#identity-error"), forgetId: $("#forget-id") };
 
   function escapeHtml(value) {
     return String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
@@ -27,6 +27,11 @@
   function shortId(value) {
     const id = String(value || "");
     return id.length > 12 ? `${id.slice(0, 8)}…` : id || "Not listed";
+  }
+  function formattedDate(value) {
+    if (!value) return "Not provided";
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString();
   }
 
   async function api(path, options = {}) {
@@ -122,6 +127,60 @@
       ui.emptyCopy.textContent = state.events.length ? "Try a different search or event status filter." : "Your campus hasn’t published any events yet.";
     }
     ui.pagination.hidden = !state.hasMore || Boolean(state.query) || state.filter !== "all";
+    drawOrganizerEvents();
+  }
+
+  function drawOrganizerEvents() {
+    if (!state.userId) {
+      ui.organizerList.innerHTML = '<div class="registration-placeholder"><span class="placeholder-icon" aria-hidden="true">▤</span><div><strong>Organizer access</strong><p>Set your campus ID to find the events you organize.</p></div><button class="text-button" type="button" data-organizer-identity>Set campus ID →</button></div>';
+      return;
+    }
+    const ownedEvents = state.events.filter((event) => String(event.organizer_id || "").toLowerCase() === state.userId.toLowerCase());
+    const cards = ownedEvents.map((event) => `<article class="organizer-event" data-organizer-event="${escapeHtml(event.id)}">
+      <div class="organizer-event-head"><div class="organizer-event-main"><h3 class="organizer-event-title">${escapeHtml(event.title || "Untitled campus event")}</h3><div class="organizer-event-meta"><span>Status · ${escapeHtml(prettyStatus(event.status))}</span><span>Capacity · ${escapeHtml(capacityText(event.capacity))}</span><span>Event ID · ${escapeHtml(shortId(event.id))}</span></div></div><button class="button button-primary attendees-toggle" type="button" data-attendees="${escapeHtml(event.id)}">View attendees <span aria-hidden="true">↓</span></button></div>
+      <div class="attendee-panel" hidden aria-live="polite"></div>
+    </article>`).join("");
+    const moreButton = state.hasMore ? '<div class="organizer-more"><button class="button button-secondary" type="button" data-organizer-more>Load more events to check <span aria-hidden="true">↓</span></button></div>' : "";
+    if (!ownedEvents.length) {
+      const message = state.events.length ? "No matching organizer event is in the events loaded so far." : "No organizer events are available yet.";
+      ui.organizerList.innerHTML = `<div class="registration-empty">${message}${state.hasMore ? " Load more events to check the next page." : ""}</div>${moreButton}`;
+      return;
+    }
+    ui.organizerList.innerHTML = `${cards}${moreButton}`;
+  }
+
+  async function loadAttendees(button) {
+    const card = button.closest("[data-organizer-event]");
+    const panel = card?.querySelector(".attendee-panel");
+    const eventId = button.dataset.attendees;
+    if (!panel || !eventId) return;
+    if (!panel.hidden && panel.dataset.state === "loaded") {
+      panel.hidden = true;
+      button.innerHTML = `View attendees (${panel.dataset.count || "0"}) <span aria-hidden="true">↓</span>`;
+      return;
+    }
+    panel.hidden = false;
+    panel.dataset.state = "loading";
+    panel.innerHTML = '<div class="attendee-loading">Loading registrations…</div>';
+    button.disabled = true;
+    button.textContent = "Loading…";
+    try {
+      const payload = await api(`/api/events/${encodeURIComponent(eventId)}/registrations`);
+      const attendees = Array.isArray(payload.data) ? payload.data : [];
+      panel.dataset.state = "loaded";
+      panel.dataset.count = String(attendees.length);
+      if (!attendees.length) {
+        panel.innerHTML = '<div class="attendee-empty">No one has registered for this event yet.</div>';
+      } else {
+        const rows = attendees.map((attendee) => `<tr><td>${escapeHtml(attendee.email || "Email not available")}</td><td class="attendee-id">${escapeHtml(attendee.user_id || "Not provided")}</td><td>${escapeHtml(formattedDate(attendee.registered_at))}</td></tr>`).join("");
+        panel.innerHTML = `<p class="attendee-count">${attendees.length} ${attendees.length === 1 ? "registration" : "registrations"}</p><div class="attendee-table-wrap"><table class="attendee-table"><thead><tr><th>Email</th><th>Campus user ID</th><th>Registered at</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+      }
+      button.innerHTML = `Hide attendees (${attendees.length}) <span aria-hidden="true">↑</span>`;
+    } catch (error) {
+      panel.dataset.state = "error";
+      panel.innerHTML = `<div class="attendee-error">${escapeHtml(error.message)}</div>`;
+      button.innerHTML = 'Retry attendee list <span aria-hidden="true">↻</span>';
+    } finally { button.disabled = false; }
   }
 
   function drawRegistrations() {
@@ -237,10 +296,18 @@
     if (details) openDetails(details.dataset.details);
     if (register) registerForEvent(register.dataset.register, register);
   });
+  ui.organizerList.addEventListener("click", (event) => {
+    const identityButton = event.target.closest("[data-organizer-identity]");
+    const moreButton = event.target.closest("[data-organizer-more]");
+    const attendeesButton = event.target.closest("[data-attendees]");
+    if (identityButton) openIdentity();
+    if (moreButton && state.hasMore && !state.loadingEvents) { state.page += 1; loadEvents(false); }
+    if (attendeesButton) loadAttendees(attendeesButton);
+  });
   $("#detail-register").addEventListener("click", () => { if (state.selectedEvent) registerForEvent(state.selectedEvent.id, $("#detail-register")); });
   $("#refresh-registrations").addEventListener("click", loadRegistrations);
   $("#retry-events").addEventListener("click", () => loadEvents());
-  ui.loadMore.addEventListener("click", () => { if (state.hasMore) { state.page += 1; loadEvents(false); } });
+  ui.loadMore.addEventListener("click", () => { if (state.hasMore && !state.loadingEvents) { state.page += 1; loadEvents(false); } });
 
   updateIdentityLabel();
   loadEvents();

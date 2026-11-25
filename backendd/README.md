@@ -36,7 +36,7 @@ The frontend and API share the deployment origin, so its `/api/...` requests nee
 
 All responses are JSON. Successful reads return `{"data": ...}`. Errors return `{"error":{"message":"..."}}`.
 
-The frontend loads events and registrations from the endpoints below. To register or view your registrations, open **Add your campus ID** in the page and enter a UUID from `users.id`. Until authentication is added, use a test account; the current API accepts the caller-supplied UUID.
+The frontend loads events and registrations from the endpoints below. To register or view your registrations, open **Add your campus ID** in the page and enter a UUID from `users.id`. Events with a matching `organizer_id` appear in the **Organizer** section, where the attendee list is loaded from the organizer-only route. Until authentication is added, use a test account; the current API accepts the caller-supplied UUID.
 
 | Method | Endpoint | Behavior |
 | --- | --- | --- |
