@@ -4,15 +4,17 @@ from __future__ import annotations
 
 import os
 import uuid
+from pathlib import Path
 from typing import Any
 
 from dotenv import load_dotenv
-from flask import Flask, current_app, jsonify, request
+from flask import Flask, current_app, jsonify, request, send_from_directory
 from postgrest import APIError
 from supabase import Client, create_client
 
 
 load_dotenv()
+FRONTEND_DIR = Path(__file__).resolve().parent.parent / "public"
 
 
 class DatabaseConfigurationError(RuntimeError):
@@ -22,6 +24,29 @@ class DatabaseConfigurationError(RuntimeError):
 def create_app(supabase_client: Client | None = None) -> Flask:
     app = Flask(__name__)
     app.config["SUPABASE_CLIENT"] = supabase_client
+
+    @app.get("/")
+    def frontend():
+        return send_from_directory(FRONTEND_DIR, "index.html")
+
+    @app.get("/frontend/<path:filename>")
+    def frontend_asset(filename: str):
+        return send_from_directory(FRONTEND_DIR, filename)
+
+    @app.get("/api")
+    def api_index():
+        return jsonify(
+            {
+                "name": "Events API",
+                "endpoints": [
+                    "GET /api/events",
+                    "GET /api/events/<id>",
+                    "POST /api/registrations",
+                    "GET /api/me/registrations",
+                    "GET /api/events/<id>/registrations",
+                ],
+            }
+        )
 
     def db() -> Client:
         client = app.config.get("SUPABASE_CLIENT")
@@ -74,21 +99,6 @@ def create_app(supabase_client: Client | None = None) -> Flask:
             .execute()
             .data
             or []
-        )
-
-    @app.get("/")
-    def index():
-        return jsonify(
-            {
-                "name": "Events API",
-                "endpoints": [
-                    "GET /api/events",
-                    "GET /api/events/<id>",
-                    "POST /api/registrations",
-                    "GET /api/me/registrations",
-                    "GET /api/events/<id>/registrations",
-                ],
-            }
         )
 
     @app.get("/api/events")

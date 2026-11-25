@@ -1,0 +1,13 @@
+.git/
+.agents/
+venv/
+.venv/
+backendd/.env
+frontant/
+data/
+database/
+code_data/
+skills/
+api.png/
+databse.png/
+New folder/

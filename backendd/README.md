@@ -1,33 +1,47 @@
 # Events API
 
-Flask backend for the `events`, `users`, and `registrations` tables shown in the database diagram. It uses the Supabase publishable key and exposes the five routes from `api.png`.
+Flask backend and CampusConnect frontend for the `events`, `users`, and `registrations` tables shown in the database diagram. The frontend follows the design in `frontant/stitch_campusconnect_event_portal` and uses the Supabase publishable key through the Flask API.
 
 ## Run locally
 
-1. Create a virtual environment and install dependencies:
+1. From the project root, create a virtual environment and install dependencies:
 
    ```powershell
    py -m venv .venv
    .\.venv\Scripts\Activate.ps1
-   pip install -r requirements.txt
+   pip install -r backendd/requirements.txt
    ```
 
-2. Copy `.env.example` to `.env` and set `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` from your Supabase project.
+2. Copy `backendd/.env.example` to `backendd/.env` and set `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` from your Supabase project.
 
-3. Start the server:
+3. Start the connected frontend and API:
 
    ```powershell
-   python app.py
+   python backendd/app.py
    ```
 
-The API listens at `http://127.0.0.1:5000` by default. `GET /` returns the route list.
+The app listens at `http://127.0.0.1:5000` by default. Open that address for the frontend. `GET /api` returns the route list.
+
+## Deploy to Vercel
+
+The repository includes a Vercel Python entry point, Python 3.12 selection, and a root dependency file. The frontend is under `public/` so Vercel can serve it as static content; Flask handles the API routes.
+
+1. Import this repository into Vercel and keep the **Root Directory** set to the project root.
+2. In the Vercel project settings, add `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` for the Preview and Production environments. Do not upload `backendd/.env`.
+3. Deploy. Vercel will use `backendd.app:app` as the Flask entry point.
+
+The frontend and API share the deployment origin, so its `/api/...` requests need no CORS setup. The Python runtime on Vercel runs Flask as a Function; Vercel serves `public/` assets from its CDN. See [Vercel's Flask guide](https://vercel.com/docs/frameworks/backend/flask) and [Python runtime guide](https://vercel.com/docs/functions/runtimes/python).
 
 ## Routes
 
 All responses are JSON. Successful reads return `{"data": ...}`. Errors return `{"error":{"message":"..."}}`.
 
+The frontend loads events and registrations from the endpoints below. To register or view your registrations, open **Add your campus ID** in the page and enter a UUID from `users.id`. Until authentication is added, use a test account; the current API accepts the caller-supplied UUID.
+
 | Method | Endpoint | Behavior |
 | --- | --- | --- |
+| GET | `/` | Serve the CampusConnect frontend. |
+| GET | `/api` | Return the API route list. |
 | GET | `/api/events?page=1&per_page=50` | Browse events; `per_page` is capped at 100. |
 | GET | `/api/events/{id}` | Return one event or 404. |
 | POST | `/api/registrations` | Create a registration; returns 201, or 409 for a duplicate or full event. |

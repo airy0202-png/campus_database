@@ -1,0 +1,1 @@
+"""CampusConnect Flask application package."""
