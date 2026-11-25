@@ -12,14 +12,16 @@
     <link rel="stylesheet" href="/frontend/app.css" />
     <script src="/frontend/app.js" defer></script>
   </head>
-  <body>
+  <body data-page="events">
     <header class="site-header">
       <a class="brand" href="#top" aria-label="CampusConnect home"><span class="brand-mark" aria-hidden="true">C</span><span>Campus<span class="brand-accent">Connect</span></span></a>
-      <nav class="main-nav" aria-label="Main navigation"><a class="nav-link active" href="#events">Events</a><a class="nav-link" href="#my-registrations">My registrations</a><a class="nav-link" href="#organizer">Organizer</a></nav>
+      <nav class="main-nav" aria-label="Main navigation"><a class="nav-link" data-page-link="events" href="/">Events</a><a class="nav-link" data-page-link="registrations" href="/my-registrations.html">My registrations</a><a class="nav-link" data-page-link="organizer" href="/organizer.html">Organizer</a></nav>
       <button class="identity-trigger" id="identity-trigger" type="button"><span class="avatar" aria-hidden="true">U</span><span id="identity-label">Add your campus ID</span><span class="chevron" aria-hidden="true">⌄</span></button>
     </header>
 
     <main id="top">
+      <section class="page-intro registrations-page-intro"><div class="page-intro-inner"><div class="page-intro-kicker"><span></span> YOUR CAMPUS PLAN</div><h1>Your campus plans,<br /><span>all in one place.</span></h1><p>Pick up where you left off and keep every registration close.</p></div><div class="page-intro-mark" aria-hidden="true">✦</div></section>
+      <section class="page-intro organizer-page-intro"><div class="page-intro-inner"><div class="page-intro-kicker"><span></span> FOR EVENT ORGANIZERS</div><h1>See who’s joining<br /><span>your events.</span></h1><p>Keep an eye on your attendee lists and welcome your campus community.</p></div><div class="page-intro-mark" aria-hidden="true">◎</div></section>
       <section class="hero">
         <div class="hero-orb orb-one" aria-hidden="true"></div><div class="hero-orb orb-two" aria-hidden="true"></div>
         <div class="hero-content">

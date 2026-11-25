@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#1e3a8a" />
+    <meta name="description" content="Keep track of your campus event registrations with CampusConnect." />
+    <title>CampusConnect — My registrations</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/frontend/app.css" />
+    <script src="/frontend/app.js" defer></script>
+  </head>
+  <body data-page="registrations">
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="CampusConnect home"><span class="brand-mark" aria-hidden="true">C</span><span>Campus<span class="brand-accent">Connect</span></span></a>
+      <nav class="main-nav" aria-label="Main navigation"><a class="nav-link" data-page-link="events" href="/">Events</a><a class="nav-link" data-page-link="registrations" href="/my-registrations.html">My registrations</a><a class="nav-link" data-page-link="organizer" href="/organizer.html">Organizer</a></nav>
+      <button class="identity-trigger" id="identity-trigger" type="button"><span class="avatar" aria-hidden="true">U</span><span id="identity-label">Add your campus ID</span><span class="chevron" aria-hidden="true">⌄</span></button>
+    </header>
+
+    <main id="top">
+      <section class="page-intro registrations-page-intro"><div class="page-intro-inner"><div class="page-intro-kicker"><span></span> YOUR CAMPUS PLAN</div><h1>Your campus plans,<br /><span>all in one place.</span></h1><p>Pick up where you left off and keep every registration close.</p></div><div class="page-intro-mark" aria-hidden="true">✦</div></section>
+      <section class="page-intro organizer-page-intro"><div class="page-intro-inner"><div class="page-intro-kicker"><span></span> FOR EVENT ORGANIZERS</div><h1>See who’s joining<br /><span>your events.</span></h1><p>Keep an eye on your attendee lists and welcome your campus community.</p></div><div class="page-intro-mark" aria-hidden="true">◎</div></section>
+      <section class="hero">
+        <div class="hero-orb orb-one" aria-hidden="true"></div><div class="hero-orb orb-two" aria-hidden="true"></div>
+        <div class="hero-content">
+          <div class="eyebrow"><span class="pulse-dot"></span> YOUR CAMPUS, YOUR COMMUNITY</div>
+          <h1>Make room for<br /><span>what’s happening.</span></h1>
+          <p>Find campus events, save your spot, and keep your registrations together.</p>
+          <form class="search-bar" id="search-form" role="search">
+            <label class="search-field"><span class="search-icon" aria-hidden="true">⌕</span><span class="sr-only">Search event titles</span><input id="search-input" type="search" placeholder="Search events by title or organizer ID" autocomplete="off" /><button class="clear-search" id="clear-search" type="button" aria-label="Clear search" hidden>×</button></label>
+            <button class="button button-primary search-submit" type="submit">Find events <span aria-hidden="true">→</span></button>
+          </form>
+          <div class="search-hint"><span class="sparkle" aria-hidden="true">✦</span> Browse what’s open and see your saved registrations.</div>
+        </div>
+      </section>
+
+      <section class="status-strip" aria-label="Event list summary"><div class="strip-copy"><span class="strip-icon" aria-hidden="true">✳</span><span id="result-summary">Loading campus events…</span></div><div class="status-key"><span class="key-dot blue"></span> Campus events <span class="key-separator">·</span> <span class="key-dot amber"></span> Registration status from your API</div></section>
+
+      <section class="content-section" id="events">
+        <div class="section-heading"><div><div class="section-kicker"><span aria-hidden="true">✦</span> DISCOVER</div><h2>Campus events</h2><p class="section-subtitle">A fresh look at what your campus has planned.</p></div>
+          <div class="view-switch" role="group" aria-label="Filter events"><button class="view-option selected" data-filter="all" type="button">All events</button><button class="view-option" data-filter="open" type="button">Open</button><button class="view-option" data-filter="closed" type="button">Closed</button></div>
+        </div>
+        <div class="notice" id="notice" role="status" aria-live="polite" hidden></div>
+        <div class="event-grid" id="event-grid" aria-live="polite" aria-busy="true"></div>
+        <div class="empty-state" id="empty-state" hidden><div class="empty-icon" aria-hidden="true">✧</div><h3 id="empty-title">No events to show</h3><p id="empty-copy">Try another search, or check back later for new campus events.</p><button class="button button-secondary" id="retry-events" type="button">Reload events</button></div>
+        <div class="pagination-row" id="pagination-row" hidden><button class="button button-secondary" id="load-more" type="button">Load more events <span aria-hidden="true">↓</span></button><span class="muted-caption" id="page-caption"></span></div>
+      </section>
+
+      <section class="join-banner"><div class="banner-art" aria-hidden="true"><span>✳</span><i></i><b></b></div><div class="banner-copy"><div class="section-kicker light">FOR STUDENTS</div><h2>Your next campus story starts here.</h2><p>Set your campus ID to register and see the events you’ve joined.</p></div><button class="button button-light" id="banner-identity" type="button">Set campus ID <span aria-hidden="true">→</span></button></section>
+
+      <section class="content-section registrations-section" id="my-registrations">
+        <div class="section-heading registration-heading"><div><div class="section-kicker"><span aria-hidden="true">▣</span> YOUR PLANS</div><h2>My registrations</h2><p class="section-subtitle">Events you’ve registered for with this campus ID.</p></div><button class="text-button" id="refresh-registrations" type="button"><span aria-hidden="true">↻</span> Refresh</button></div>
+        <div class="registration-list" id="registration-list" aria-live="polite"><div class="registration-placeholder"><span class="placeholder-icon" aria-hidden="true">♧</span><div><strong>Keep your plans in one place</strong><p>Add your campus ID to see your registrations here.</p></div><button class="text-button" id="registration-identity" type="button">Add campus ID →</button></div></div>
+      </section>
+      <section class="content-section organizer-section" id="organizer">
+        <div class="section-heading"><div><div class="section-kicker"><span aria-hidden="true">▤</span> ORGANIZER TOOLS</div><h2>Attendee registrations</h2><p class="section-subtitle">Review the people registered for events you organize.</p></div></div>
+        <div class="organizer-security-note" role="note"><span class="security-icon" aria-hidden="true">!</span><span><strong>Demo access:</strong> The current API identifies the organizer by a typed UUID, not a verified sign-in. Anyone who knows that UUID could impersonate the organizer. Don’t show real attendee emails publicly until authentication is added.</span></div>
+        <div class="organizer-list" id="organizer-list" aria-live="polite"><div class="registration-empty">Set your campus ID to find events organized by you.</div></div>
+      </section>
+    </main>
+
+    <footer class="site-footer"><a class="brand footer-brand" href="#top"><span class="brand-mark" aria-hidden="true">C</span><span>Campus<span class="brand-accent">Connect</span></span></a><p>Find your people. Show up for your campus.</p><span class="footer-note">Powered by your campus events API</span></footer>
+
+    <dialog class="modal" id="identity-dialog" aria-labelledby="identity-title">
+      <form method="dialog" class="modal-close-row"><button class="icon-button" aria-label="Close" value="cancel">×</button></form>
+      <div class="modal-symbol" aria-hidden="true">◎</div><div class="section-kicker">CAMPUS PROFILE</div><h2 id="identity-title">Connect your campus ID</h2>
+      <p class="modal-copy">Enter the UUID from your <code>users.id</code> record to register for events and load your saved registrations.</p>
+      <form id="identity-form" novalidate><label class="form-label" for="user-id-input">Campus user ID</label><input class="text-input" id="user-id-input" name="user_id" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" autocomplete="off" spellcheck="false" /><p class="form-error" id="identity-error" aria-live="polite"></p>
+        <div class="privacy-note"><span aria-hidden="true">ⓘ</span><span>This demo API uses a caller-supplied ID and does not sign users in. Only use a test account until authentication is added.</span></div>
+        <div class="modal-actions"><button class="button button-secondary" id="forget-id" type="button" hidden>Forget ID</button><button class="button button-primary" type="submit">Save campus ID</button></div>
+      </form>
+    </dialog>
+
+    <dialog class="modal detail-modal" id="event-dialog" aria-labelledby="detail-title"><form method="dialog" class="modal-close-row"><button class="icon-button" aria-label="Close" value="cancel">×</button></form><div class="detail-topline"><span class="event-mark large" aria-hidden="true">✳</span><span class="status-badge" id="detail-status"></span></div><div class="section-kicker">EVENT DETAILS</div><h2 id="detail-title"></h2><p class="detail-description">Event details available from your campus API.</p><dl class="detail-facts" id="detail-facts"></dl><button class="button button-primary detail-register" id="detail-register" type="button">Register for this event <span aria-hidden="true">→</span></button></dialog>
+    <div class="toast" id="toast" role="status" aria-live="polite"><span class="toast-check" aria-hidden="true">✓</span><span id="toast-message"></span></div>
+  </body>
+</html>

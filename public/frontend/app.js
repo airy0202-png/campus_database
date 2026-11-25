@@ -8,6 +8,7 @@
   const glyphs = ["✳", "◈", "↗", "✧", "◎", "⌘"];
   const state = { events: [], registrations: [], page: 1, hasMore: false, query: "", filter: "all", userId: localStorage.getItem(STORAGE_KEY) || "", selectedEvent: null, loadingEvents: false, pendingEventId: null };
   const $ = (selector) => document.querySelector(selector);
+  const currentPage = document.body.dataset.page || "events";
   const ui = { grid: $("#event-grid"), summary: $("#result-summary"), empty: $("#empty-state"), emptyTitle: $("#empty-title"), emptyCopy: $("#empty-copy"), notice: $("#notice"), pagination: $("#pagination-row"), pageCaption: $("#page-caption"), loadMore: $("#load-more"), registrationList: $("#registration-list"), organizerList: $("#organizer-list"), identityDialog: $("#identity-dialog"), eventDialog: $("#event-dialog"), identityInput: $("#user-id-input"), identityError: $("#identity-error"), forgetId: $("#forget-id") };
 
   function escapeHtml(value) {
@@ -266,7 +267,8 @@
     localStorage.setItem(STORAGE_KEY, state.userId);
     updateIdentityLabel();
     ui.identityDialog.close();
-    await loadRegistrations();
+    if (currentPage === "organizer") await loadEvents();
+    else await loadRegistrations();
     if (state.pendingEventId) {
       const eventId = state.pendingEventId;
       state.pendingEventId = null;
@@ -309,7 +311,10 @@
   $("#retry-events").addEventListener("click", () => loadEvents());
   ui.loadMore.addEventListener("click", () => { if (state.hasMore && !state.loadingEvents) { state.page += 1; loadEvents(false); } });
 
+  document.querySelectorAll("[data-page-link]").forEach((link) => {
+    link.classList.toggle("active", link.dataset.pageLink === currentPage);
+  });
   updateIdentityLabel();
-  loadEvents();
-  loadRegistrations();
+  if (currentPage !== "registrations") loadEvents();
+  if (currentPage !== "organizer") loadRegistrations();
 })();

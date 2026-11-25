@@ -29,6 +29,14 @@ def create_app(supabase_client: Client | None = None) -> Flask:
     def frontend():
         return send_from_directory(FRONTEND_DIR, "index.html")
 
+    @app.get("/my-registrations.html")
+    def registrations_page():
+        return send_from_directory(FRONTEND_DIR, "my-registrations.html")
+
+    @app.get("/organizer.html")
+    def organizer_page():
+        return send_from_directory(FRONTEND_DIR, "organizer.html")
+
     @app.get("/frontend/<path:filename>")
     def frontend_asset(filename: str):
         return send_from_directory(FRONTEND_DIR, filename)

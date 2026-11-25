@@ -22,6 +22,8 @@ Flask backend and CampusConnect frontend for the `events`, `users`, and `registr
 
 The app listens at `http://127.0.0.1:5000` by default. Open that address for the frontend. `GET /api` returns the route list.
 
+The site has three pages: events at `/`, registrations at `/my-registrations.html`, and organizer tools at `/organizer.html`. The same pages are served as static files from `public/` on Vercel.
+
 ## Deploy to Vercel
 
 The repository includes a Vercel Python entry point, Python 3.12 selection, and a root dependency file. The frontend is under `public/` so Vercel can serve it as static content; Flask handles the API routes.
@@ -41,6 +43,8 @@ The frontend loads events and registrations from the endpoints below. To registe
 | Method | Endpoint | Behavior |
 | --- | --- | --- |
 | GET | `/` | Serve the CampusConnect frontend. |
+| GET | `/my-registrations.html` | Show the current user's registrations. |
+| GET | `/organizer.html` | Show events owned by the current user and their attendee lists. |
 | GET | `/api` | Return the API route list. |
 | GET | `/api/events?page=1&per_page=50` | Browse events; `per_page` is capped at 100. |
 | GET | `/api/events/{id}` | Return one event or 404. |
