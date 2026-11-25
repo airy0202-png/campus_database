@@ -39,7 +39,7 @@ def create_app(supabase_client: Client | None = None) -> Flask:
 
     @app.get("/frontend/<path:filename>")
     def frontend_asset(filename: str):
-        return send_from_directory(FRONTEND_DIR, filename)
+        return send_from_directory(FRONTEND_DIR / "frontend", filename)
 
     @app.get("/api")
     def api_index():
